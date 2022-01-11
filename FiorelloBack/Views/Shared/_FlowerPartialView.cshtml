@@ -1,0 +1,50 @@
+﻿@model List<Flower>
+
+@foreach (Flower flower in Model)
+{
+<div data-aos-offset="100"
+         class="product col-lg-3 col-md-6
+             @foreach (FlowerCategory flowerCategory in flower.FlowerCategories)
+	{
+		 @(flowerCategory.Category.Name.ToLower() + " ");
+             }
+
+             all">
+    <div >
+        <div class="productImage">
+            @foreach (FlowerImage image in flower.FlowerImages)
+            {
+
+
+                if (image.isMain)
+                {
+            <a asp-controller="flower" asp-action="details" asp-route-id="@flower.Id">
+                <img src="@image.Image"
+                     alt="">
+            </a>
+                    
+                }
+            }
+
+        </div>
+        <div class="productTitle">
+            <p>@flower.Name</p>
+        </div>
+        <div class="productPrice">
+            @if (flower.CampaignId == null)
+            {
+                <span class="addToCardBtn" data-id="@flower.Id">Add to cart</span><span>$</span><span>@flower.Price</span>
+            }
+            else
+            {
+                <span class="addToCardBtn" data-id="@flower.Id">Add to cart</span><span style="text-decoration: line-through;">$@flower.Price</span>
+                <span>$</span><span>@(flower.Price * (100 - flower.Campaign.DiscountPercent)/100)</span>
+            }
+        </div>
+        <div class="addToCart">
+            <a style="position:relative; " asp-controller="flower" asp-action="addbasket" asp-route-id="@flower.Id">Buy</a>
+        </div>
+
+    </div>
+</div>
+}
