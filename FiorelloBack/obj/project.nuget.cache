@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3duTeGNmiWzkkZRaYcrfuwjNbCaLFXF6jJKApFqfW7VgEH1Gq7qwQO76qfCnfdNzqqI5fEry65Y6C8jrVIv8zA==",
+  "dgSpecHash": "jZTw134/pbcpyJHyjWWt5PV5wUobSXqpWWJeyEOq/3v4XfGIRaPONXXW66+I54+i+ISEW100en/zUle3AN/pPg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Lenovo\\source\\repos\\FiorelloBack\\FiorelloBack\\FiorelloBack.csproj",
+  "projectFilePath": "C:\\Users\\Lenovo\\Desktop\\P223-FierolloToBack\\FiorelloBack\\FiorelloBack.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.aspnetcore.razor\\2.2.0\\microsoft.aspnetcore.razor.2.2.0.nupkg.sha512",

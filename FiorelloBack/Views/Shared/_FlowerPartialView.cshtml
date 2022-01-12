@@ -18,7 +18,7 @@
 
                 if (image.isMain)
                 {
-            <a asp-controller="flower" asp-action="details" asp-route-id="@flower.Id">
+            <a asp-controller="flower" asp-action="details" asp-route-id="@flower.Id" asp-route-categoryId="@flower.FlowerCategories.FirstOrDefault().CategoryId">
                 <img src="@image.Image"
                      alt="">
             </a>

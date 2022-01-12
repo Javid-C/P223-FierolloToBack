@@ -8480,11 +8480,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lenovo\\source\\repos\\FiorelloBack\\FiorelloBack\\FiorelloBack.csproj",
+      "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\P223-FierolloToBack\\FiorelloBack\\FiorelloBack.csproj",
       "projectName": "FiorelloBack",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\FiorelloBack\\FiorelloBack\\FiorelloBack.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Desktop\\P223-FierolloToBack\\FiorelloBack\\FiorelloBack.csproj",
       "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lenovo\\source\\repos\\FiorelloBack\\FiorelloBack\\obj\\",
+      "outputPath": "C:\\Users\\Lenovo\\Desktop\\P223-FierolloToBack\\FiorelloBack\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
