@@ -59,5 +59,94 @@ namespace FiorelloBack.Areas.Manage.Controllers
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult Edit(int id)
+        {
+            Slider slider = _context.Sliders.FirstOrDefault(s=>s.Id == id);
+            if (slider == null) return NotFound();
+            return View(slider);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Slider slider)
+        {
+            Slider existSlider = _context.Sliders.FirstOrDefault(s => s.Id == slider.Id);
+
+            if (existSlider == null) return NotFound();
+            if (!ModelState.IsValid) return View(existSlider);
+
+            if(slider.ImageFile != null && slider.SignatureFile == null)
+            {
+                if (!slider.ImageFile.IsImage())
+                {
+                    ModelState.AddModelError("ImageFile", "Please select image file");
+                    return View(existSlider);
+                }
+                if (!slider.ImageFile.IsSizeOkay(2))
+                {
+                    ModelState.AddModelError("ImageFile", "Image size must be max 2MB");
+                    return View(existSlider);
+                }
+
+                Helpers.Helper.DeleteImg(_env.WebRootPath, "assets/images", existSlider.Image);
+                existSlider.Image = slider.ImageFile.SaveImg(_env.WebRootPath, "assets/images");
+            }else if(slider.ImageFile == null && slider.SignatureFile != null)
+            {
+
+                if (!slider.SignatureFile.IsImage())
+                {
+                    ModelState.AddModelError("SignatureFile", "Please select image file");
+                    return View(existSlider);
+                }
+                if (!slider.SignatureFile.IsSizeOkay(2))
+                {
+                    ModelState.AddModelError("SignatureFile", "Image size must be max 2MB");
+                    return View(existSlider);
+                }
+
+                if(existSlider.Signature != null)
+                {
+                    Helpers.Helper.DeleteImg(_env.WebRootPath, "assets/images", existSlider.Signature);
+                }
+                existSlider.Signature = slider.SignatureFile.SaveImg(_env.WebRootPath, "assets/images");
+            }else if(slider.ImageFile !=null && slider.SignatureFile != null)
+            {
+
+                if (!slider.SignatureFile.IsImage())
+                {
+                    ModelState.AddModelError("SignatureFile", "Please select image file");
+                    return View(existSlider);
+                }
+                if (!slider.SignatureFile.IsSizeOkay(2))
+                {
+                    ModelState.AddModelError("SignatureFile", "Image size must be max 2MB");
+                    return View(existSlider);
+                }
+                if (!slider.ImageFile.IsImage())
+                {
+                    ModelState.AddModelError("ImageFile", "Please select image file");
+                    return View(existSlider);
+                }
+                if (!slider.ImageFile.IsSizeOkay(2))
+                {
+                    ModelState.AddModelError("ImageFile", "Image size must be max 2MB");
+                    return View(existSlider);
+                }
+
+                if(existSlider.Signature != null)
+                {
+                    Helpers.Helper.DeleteImg(_env.WebRootPath, "assets/images", existSlider.Signature);
+                }
+                existSlider.Signature = slider.SignatureFile.SaveImg(_env.WebRootPath, "assets/images");
+
+                Helpers.Helper.DeleteImg(_env.WebRootPath, "assets/images", existSlider.Image);
+                existSlider.Image = slider.ImageFile.SaveImg(_env.WebRootPath, "assets/images");
+            }
+            existSlider.Title = slider.Title;
+            existSlider.SubTitle = slider.SubTitle;
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+
+        }
     }
 }

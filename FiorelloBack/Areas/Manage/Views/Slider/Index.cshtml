@@ -41,16 +41,25 @@
                     @slider.Id
                 </td>
                 <td>
-                    <img style="width:100px;height:100px;object-fit:contain" src="~/assets/images/@slider.Image"  alt="slider image"/>
+                    <img style="width:100px;height:100px;object-fit:contain" src="~/assets/images/@slider.Image" alt="slider image" />
                 </td>
                 <td>
                     @slider.Title
                 </td>
+                @if (slider.SubTitle.Length > 25)
+                {
+                    <td>
+                        @slider.SubTitle.Substring(0, 25)...
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @slider.SubTitle
+                    </td>
+                }
                 <td>
-                    @slider.SubTitle.Substring(0,25)...
-                </td>
-                <td>
-                    <img  style="width:100px;height:100px;object-fit:contain" src="@slider.Signature"  alt="signature image"/>
+                    <img style="width:100px;height:100px;object-fit:contain" src="~/assets/images/@slider.Signature" alt="signature image" />
                 </td>
                 <td>
                     <a asp-controller="slider" asp-action="edit" asp-route-id="@slider.Id" class="btn btn-warning btn-icon-text">

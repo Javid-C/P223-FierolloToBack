@@ -1,0 +1,88 @@
+﻿@model List<Flower>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container">
+    <div class="mt-2 d-flex" style="justify-content:flex-end">
+        <a asp-controller="flower" asp-action="create" class="btn btn-success btn-icon-text">
+            <i class="mdi mdi-upload btn-icon-prepend"></i>
+            Create
+        </a>
+    </div>
+    <table class="mt-3 table table-dark">
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Flower image
+                </th>
+                <th>
+                    Flower name
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Settings
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Flower flower in Model)
+            {
+            <tr>
+                <td>
+                    @flower.Id
+                </td>
+                @if (@flower.FlowerImages.FirstOrDefault(f => f.isMain == true).Image.Contains("https://"))
+                {
+                    <td>
+                        <img style="width:100px;height:100px;object-fit:contain" src="@flower.FlowerImages.FirstOrDefault(f=>f.isMain == true).Image" alt="flower image" />
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <img style="width:100px;height:100px;object-fit:contain" src="~/assets/images/@flower.FlowerImages.FirstOrDefault(f=>f.isMain == true).Image" alt="flower image" />
+                    </td>
+                }
+                <td>
+                    @flower.Name
+                </td>
+                <td>
+                    @flower.Price
+                </td>
+                @if (flower.Description.Length > 25)
+                {
+                    <td>
+                        @flower.Description.Substring(0, 25)...
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @flower.Description
+                    </td>
+                }
+
+                <td>
+                    <a asp-controller="flower" asp-action="edit" asp-route-id="@flower.Id" class="btn btn-warning btn-icon-text">
+                        <i class="mdi mdi-file-check btn-icon-append"></i>
+                        Edit
+                    </a>
+                    <a asp-controller="flower" asp-action="delete" asp-route-id="@flower.Id" class="btn btn-danger btn-icon-text delete-item">
+                        <i class="mdi mdi-alert btn-icon-prepend"></i>
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
