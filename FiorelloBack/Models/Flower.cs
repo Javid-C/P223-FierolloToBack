@@ -35,6 +35,8 @@ namespace FiorelloBack.Models
         public List<int> CategoryIds { get; set; }
         [NotMapped]
         public List<IFormFile> ImageFiles { get; set; }
+        [NotMapped]
+        public List<int> ImageIds { get; set; }
 
 
     }

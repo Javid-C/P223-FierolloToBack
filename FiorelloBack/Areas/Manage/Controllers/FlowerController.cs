@@ -17,14 +17,14 @@ namespace FiorelloBack.Areas.Manage.Controllers
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _env;
 
-        public FlowerController(AppDbContext context,IWebHostEnvironment env)
+        public FlowerController(AppDbContext context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
         }
         public IActionResult Index()
         {
-            List<Flower> flowers = _context.Flowers.Include(f=>f.FlowerImages).ToList();
+            List<Flower> flowers = _context.Flowers.Include(f => f.FlowerImages).ToList();
             return View(flowers);
         }
 
@@ -42,7 +42,7 @@ namespace FiorelloBack.Areas.Manage.Controllers
             ViewBag.Categories = _context.Categories.ToList();
             if (!ModelState.IsValid) return View();
 
-            if(flower.CampaignId == 0)
+            if (flower.CampaignId == 0)
             {
                 flower.CampaignId = null;
             }
@@ -57,7 +57,7 @@ namespace FiorelloBack.Areas.Manage.Controllers
                 };
                 flower.FlowerCategories.Add(fCategory);
             }
-            if(flower.ImageFiles.Count > 5)
+            if (flower.ImageFiles.Count > 5)
             {
                 ModelState.AddModelError("ImageFiles", "You can choose only 5 images");
                 return View();
@@ -74,7 +74,7 @@ namespace FiorelloBack.Areas.Manage.Controllers
                     ModelState.AddModelError("ImageFiles", "Image size must be max 2MB");
                     return View();
                 }
-              
+
             }
             foreach (var image in flower.ImageFiles)
             {
@@ -95,10 +95,112 @@ namespace FiorelloBack.Areas.Manage.Controllers
         {
             ViewBag.Campaigns = _context.Campaigns.ToList();
             ViewBag.Categories = _context.Categories.ToList();
-           
-            Flower flower = _context.Flowers.Include(f=>f.FlowerCategories).FirstOrDefault(f => f.Id == id);
+
+            Flower flower = _context.Flowers.Include(f => f.FlowerCategories).Include(f => f.FlowerImages).FirstOrDefault(f => f.Id == id);
             if (flower == null) return NotFound();
             return View(flower);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Flower flower)
+        {
+
+            ViewBag.Campaigns = _context.Campaigns.ToList();
+            ViewBag.Categories = _context.Categories.ToList();
+            Flower existedFlower = _context.Flowers.Include(f=>f.FlowerImages).Include(f=>f.FlowerCategories).FirstOrDefault(f => f.Id == flower.Id);
+
+
+            if (!ModelState.IsValid) return View(existedFlower);
+
+            if (existedFlower == null) return NotFound();
+            
+            if(flower.ImageFiles != null)
+            {
+                foreach (var image in flower.ImageFiles)
+                {
+                    if (!image.IsImage())
+                    {
+                        ModelState.AddModelError("ImageFiles", "Please select the image file");
+                        return View(existedFlower);
+                    }
+                    if (!image.IsSizeOkay(2))
+                    {
+                        ModelState.AddModelError("ImageFiles","You can choose file which size is max 2MB");
+                        return View(existedFlower);
+                    }
+                }
+
+                List<FlowerImage> removableImages = existedFlower.FlowerImages.Where(fi => fi.isMain == false && !flower.ImageIds.Contains(fi.Id)).ToList();
+
+                existedFlower.FlowerImages.RemoveAll(fi => removableImages.Any(ri => ri.Id == fi.Id));
+
+                foreach (var item in removableImages)
+                {
+                    Helpers.Helper.DeleteImg(_env.WebRootPath, "assets/images", item.Image);
+                }
+
+                foreach (var image in flower.ImageFiles)
+                {
+                    FlowerImage flowerImage = new FlowerImage
+                    {
+                        Image = image.SaveImg(_env.WebRootPath, "assets/images"),
+                        isMain = false,
+                        FlowerId = existedFlower.Id
+                    };
+                    existedFlower.FlowerImages.Add(flowerImage);
+                }
+
+
+                List<FlowerCategory> removableCategories = existedFlower.FlowerCategories.Where(fc => !flower.CategoryIds.Contains(fc.Id)).ToList();
+
+                existedFlower.FlowerCategories.RemoveAll(fc => removableCategories.Any(rc => fc.Id == rc.Id));
+                foreach (var categoryId in flower.CategoryIds)
+                {
+                    FlowerCategory flowerCategory = existedFlower.FlowerCategories.FirstOrDefault(fc => fc.CategoryId == categoryId);
+                    if (flowerCategory == null)
+                    {
+                        FlowerCategory fCategory = new FlowerCategory
+                        {
+                            CategoryId = categoryId,
+                            FlowerId = existedFlower.Id
+                        };
+                        existedFlower.FlowerCategories.Add(fCategory);
+                    }
+                }
+            }
+            //List<FlowerCategory> removableCategories = existedFlower.FlowerCategories.Where(fc => !flower.CategoryIds.Contains(fc.Id)).ToList();
+
+            //existedFlower.FlowerCategories.RemoveAll(fc => removableCategories.Any(rc => fc.Id == rc.Id));
+            //foreach (var categoryId in flower.CategoryIds)
+            //{
+            //    FlowerCategory flowerCategory = existedFlower.FlowerCategories.FirstOrDefault(fc => fc.CategoryId == categoryId);
+            //    if (flowerCategory == null)
+            //    {
+            //        FlowerCategory fCategory = new FlowerCategory
+            //        {
+            //            CategoryId = categoryId,
+            //            FlowerId = existedFlower.Id
+            //        };
+            //        existedFlower.FlowerCategories.Add(fCategory);
+            //    }
+            //}
+
+            existedFlower.Name = flower.Name;
+            existedFlower.Price = flower.Price;
+            existedFlower.Description = flower.Description;
+            existedFlower.Weight = flower.Weight;
+            existedFlower.Dimension = flower.Dimension;
+            existedFlower.SKUCode = flower.SKUCode;
+            existedFlower.InStock = flower.InStock;
+            if (flower.CampaignId == 0)
+            {
+                flower.CampaignId = null;
+            }
+            existedFlower.Campaign = flower.Campaign;
+
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
