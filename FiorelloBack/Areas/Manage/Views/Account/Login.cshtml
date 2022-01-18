@@ -1,4 +1,4 @@
-﻿@model RegisterVM
+﻿@model LoginVM
 @{
     Layout = null;
 }
@@ -11,7 +11,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Majestic Admin</title>
+    <title>Fiorello login</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="~/admin/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="~/admin/assets/vendors/base/vendor.bundle.base.css">
@@ -32,47 +32,34 @@
                     <div class="col-lg-4 mx-auto">
                         <div class="auth-form-light text-left py-5 px-4 px-sm-5">
                             <div class="brand-logo">
-                                <img src="https://fiorello.qodeinteractive.com/wp-content/uploads/2018/05/h2-logo-1.png" alt="logo">
+                                <img src="~/admin/assets/images/logo.svg" alt="logo">
                             </div>
-                            <h4>New here?</h4>
-                            <h6 class="font-weight-light">Signing up is easy. It only takes a few steps</h6>
+                            <h4>Admin panel</h4>
                             <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+                            <h6 class="font-weight-light">Sign in to continue.</h6>
                             <form class="pt-3" method="post">
                                 <div class="form-group">
-                                    <input asp-for="Fullname"  class="form-control form-control-lg" placeholder="Fullname"><br />
-                                    <span class="text-danger text" asp-validation-for="Fullname"></span>
-                                </div>
-                                <div class="form-group">
                                     <input asp-for="Username" class="form-control form-control-lg" placeholder="Username"><br />
-                                    <span class="text-danger text" asp-validation-for="Username"></span>
+                                    <span class="text text-danger" asp-validation-for="Username"></span>
                                 </div>
-                                <div class="form-group">
-                                    <input asp-for="Email" class="form-control form-control-lg" placeholder="Email"><br />
-                                    <span class="text-danger text" asp-validation-for="Email"></span>
-                                </div>
-
                                 <div class="form-group">
                                     <input asp-for="Password" class="form-control form-control-lg" placeholder="Password"><br />
-                                    <span class="text-danger text" asp-validation-for="Password"></span>
-                                </div>
-                                <div class="form-group">
-                                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="Confirm Password"><br />
-                                    <span class="text-danger text" asp-validation-for="ConfirmPassword"></span>
-                                </div>
-                                <div class="mb-4">
-                                    <div class="form-check">
-                                        <label class="form-check-label text-muted">
-                                            <input asp-for="Terms" class="form-check-input">
-                                            I agree to all Terms & Conditions
-                                        </label>
-                                        <span class="text text-danger" asp-validation-for="Terms"></span>
-                                    </div>
+                                    <span class="text text-danger" asp-validation-for="Password"></span>
                                 </div>
                                 <div class="mt-3">
-                                    <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN UP</button>
+                                    <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</button>
+                                </div>
+                                <div class="my-2 d-flex justify-content-between align-items-center">
+                                    <div class="form-check">
+                                        <label class="form-check-label text-muted">
+                                            <input asp-for="RememberMe" class="form-check-input">
+                                            Keep me signed in
+                                        </label>
+                                    </div>
+                                    <a href="#" class="auth-link text-black">Forgot password?</a>
                                 </div>
                                 <div class="text-center mt-4 font-weight-light">
-                                    Already have an account? <a asp-controller="account" asp-action="login" class="text-primary">Login</a>
+                                    Don't have an account? <a asp-controller="account" asp-action="register" class="text-primary">Create</a>
                                 </div>
                             </form>
                         </div>

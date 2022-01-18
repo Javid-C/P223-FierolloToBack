@@ -53,6 +53,10 @@ namespace FiorelloBack
                 option.Password.RequireNonAlphanumeric = false;
                 option.Password.RequireLowercase = false;
                 option.Password.RequireUppercase = false;
+
+                option.Lockout.MaxFailedAccessAttempts = 5;
+                option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                option.Lockout.AllowedForNewUsers = true;
             }).AddDefaultTokenProviders().AddEntityFrameworkStores<AppDbContext>();
         }
 
