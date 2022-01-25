@@ -1,4 +1,7 @@
 ﻿@inject FiorelloBack.Services.LayoutServices layoutService
+@{ 
+    BasketVM basket = await layoutService.ShowBasket();
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,7 +22,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital@1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    @RenderSection("CSS", required: false)
     <link rel="stylesheet" href="~/assets/scss/owl.carousel.min.css">
     <link rel="stylesheet" href="~/assets/scss/owl.theme.default.min.css">
     <link rel="stylesheet" href="~/assets/scss/style.css">
@@ -364,7 +368,7 @@
                                 </div>
                                 <div class="basketList" style="width:220px">
                                     <div class="listProducts">
-                                        @foreach (var item in layoutService.ShowBasket().BasketItems)
+                                        @foreach (var item in basket.BasketItems)
                                         {
                                             <div class="product">
                                                 <div class="image">
@@ -398,16 +402,16 @@
                                             </div>
                                             <div class="priceText">
                                                 <span>$</span>
-                                                <span>@layoutService.ShowBasket().TotalPrice</span>
+                                                <span>@basket.TotalPrice</span>
                                             </div>
                                         </div>
                                         <div class="viewCart-checkOut">
                                             <div class="viewCartBox">
                                                 <span>VIEW CART</span>
                                             </div>
-                                            <div class="checkOutBox">
+                                            <a class="checkOutBox" asp-controller="Order" asp-action="Checkout">
                                                 <span>CHECKOUT</span>
-                                            </div>
+                                            </a>
                                         </div>
                                     </div>
 
@@ -975,6 +979,7 @@
 
 
     <script src="~/assets/js/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     @RenderSection("Scripts", required: false)
     <script src="~/assets/js/main.js"></script>
     <script src="~/assets/js/homepage.js"></script>

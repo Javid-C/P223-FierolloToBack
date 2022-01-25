@@ -329,3 +329,4 @@ C:\Users\Lenovo\Desktop\P223-FierolloToBack\FiorelloBack\bin\Debug\netcoreapp3.1
 C:\Users\Lenovo\Desktop\P223-FierolloToBack\FiorelloBack\obj\Debug\netcoreapp3.1\Razor\Views\Account\Login.cshtml.g.cs
 C:\Users\Lenovo\Desktop\P223-FierolloToBack\FiorelloBack\obj\Debug\netcoreapp3.1\Razor\Areas\Manage\Views\Account\Login.cshtml.g.cs
 C:\Users\Lenovo\Desktop\P223-FierolloToBack\FiorelloBack\obj\Debug\netcoreapp3.1\Razor\Views\Account\Edit.cshtml.g.cs
+C:\Users\Lenovo\Desktop\P223-FierolloToBack\FiorelloBack\obj\Debug\netcoreapp3.1\Razor\Views\Order\Checkout.cshtml.g.cs

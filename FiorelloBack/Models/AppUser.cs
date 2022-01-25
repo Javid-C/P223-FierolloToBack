@@ -10,5 +10,8 @@ namespace FiorelloBack.Models
     {
         public string Fullname { get; set; }
         public bool IsAdmin { get; set; }
+        public List<BasketItem> BasketItems { get; set; }
+        public List<OrderItem> OrderItems { get; set; }
+        public List<Order> Orders { get; set; }
     }
 }

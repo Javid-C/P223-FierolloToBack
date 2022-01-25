@@ -2,6 +2,7 @@
 using FiorelloBack.Models;
 using FiorelloBack.ViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -16,10 +17,13 @@ namespace FiorelloBack.Services
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContext;
-        public LayoutServices(AppDbContext context,IHttpContextAccessor httpContextAccessor)
+        private readonly UserManager<AppUser> _userManager;
+
+        public LayoutServices(AppDbContext context,IHttpContextAccessor httpContextAccessor,UserManager<AppUser> userManager)
         {
             _context = context;
             _httpContext = httpContextAccessor;
+            _userManager = userManager;
         }
 
         public Setting getSettingDatas()
@@ -27,7 +31,7 @@ namespace FiorelloBack.Services
             Setting data = _context.Settings.FirstOrDefault();
             return data;
         }
-        public BasketVM ShowBasket()
+        public async Task<BasketVM> ShowBasket()
         {
             string basket = _httpContext.HttpContext.Request.Cookies["Basket"];
 
@@ -38,46 +42,71 @@ namespace FiorelloBack.Services
                 BasketItems = new List<BasketItemVM>(),
                 Count = 0
             };
-            if (!string.IsNullOrEmpty(basket))
+            if (_httpContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                List<BasketCookieItemVM> basketCookieItems = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(basket);
-
-                foreach (BasketCookieItemVM item in basketCookieItems)
+                AppUser user = await _userManager.FindByNameAsync(_httpContext.HttpContext.User.Identity.Name);
+                List < BasketItem > basketItems = _context.BasketItems.Include(b => b.AppUser).Where(b => b.AppUserId == user.Id).ToList();
+                foreach (BasketItem item in basketItems)
                 {
-                    Flower flower = _context.Flowers.FirstOrDefault(f => f.Id == item.Id);
+                    Flower flower = _context.Flowers.Include(f=>f.Campaign).FirstOrDefault(f => f.Id == item.FlowerId);
                     if(flower != null)
                     {
-                        BasketItemVM basketItem = new BasketItemVM
+                        BasketItemVM basketItemVM = new BasketItemVM
                         {
-                            Flower = _context.Flowers.Include(f => f.Campaign).Include(f => f.FlowerImages).FirstOrDefault(f => f.Id == item.Id),
+                            Flower = flower,
                             Count = item.Count
-                          
                         };
-                        basketItem.Price = basketItem.Flower.CampaignId == null ? basketItem.Flower.Price: basketItem.Flower.Price * (100 - basketItem.Flower.Campaign.DiscountPercent) / 100;
-                        basketData.BasketItems.Add(basketItem);
+                        basketItemVM.Price = flower.CampaignId == null ? flower.Price : flower.Price * (100 - flower.Campaign.DiscountPercent) / 100;
+                        basketData.BasketItems.Add(basketItemVM);
                         basketData.Count++;
-                        basketData.TotalPrice += basketItem.Price * basketItem.Count;
+                        basketData.TotalPrice += basketItemVM.Price * basketItemVM.Count;
                     }
                 }
-
-                //foreach (BasketItemVM item in basketVM.BasketItems)
-                //{
-                //    item.Flower = _context.Flowers.FirstOrDefault(f => f.Id == item.Flower.Id);
-                //    if(item.Flower != null)
-                //    {
-                //        basketData.BasketItems.Add(item);
-                //        if (item.Flower.CampaignId == null)
-                //        {
-                //            basketData.TotalPrice += item.Flower.Price * item.Count;
-                //        }
-                //        else
-                //        {
-                //            basketData.TotalPrice += item.Flower.Price * (100 - item.Flower.Campaign.DiscountPercent) / 100 * item.Count;
-                //        }
-                //        basketData.Count++;
-                //    }
-                //}
             }
+            else
+            {
+                if (!string.IsNullOrEmpty(basket))
+                {
+                    List<BasketCookieItemVM> basketCookieItems = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(basket);
+
+                    foreach (BasketCookieItemVM item in basketCookieItems)
+                    {
+                        Flower flower = _context.Flowers.FirstOrDefault(f => f.Id == item.Id);
+                        if (flower != null)
+                        {
+                            BasketItemVM basketItem = new BasketItemVM
+                            {
+                                Flower = _context.Flowers.Include(f => f.Campaign).Include(f => f.FlowerImages).FirstOrDefault(f => f.Id == item.Id),
+                                Count = item.Count
+
+                            };
+                            basketItem.Price = basketItem.Flower.CampaignId == null ? basketItem.Flower.Price : basketItem.Flower.Price * (100 - basketItem.Flower.Campaign.DiscountPercent) / 100;
+                            basketData.BasketItems.Add(basketItem);
+                            basketData.Count++;
+                            basketData.TotalPrice += basketItem.Price * basketItem.Count;
+                        }
+                    }
+
+                    //foreach (BasketItemVM item in basketVM.BasketItems)
+                    //{
+                    //    item.Flower = _context.Flowers.FirstOrDefault(f => f.Id == item.Flower.Id);
+                    //    if(item.Flower != null)
+                    //    {
+                    //        basketData.BasketItems.Add(item);
+                    //        if (item.Flower.CampaignId == null)
+                    //        {
+                    //            basketData.TotalPrice += item.Flower.Price * item.Count;
+                    //        }
+                    //        else
+                    //        {
+                    //            basketData.TotalPrice += item.Flower.Price * (100 - item.Flower.Campaign.DiscountPercent) / 100 * item.Count;
+                    //        }
+                    //        basketData.Count++;
+                    //    }
+                    //}
+                }
+            }
+           
             return basketData;
 
         }
