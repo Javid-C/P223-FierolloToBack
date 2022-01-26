@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace FiorelloBack.Controllers
@@ -65,6 +67,72 @@ namespace FiorelloBack.Controllers
             return View();
         }
 
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(AccountVM account)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(account.AppUser.Email);
+            if (user == null) return BadRequest();
+
+            string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            string link = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme, Request.Host.ToString());
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress("alialiyevasmoy@gmail.com","Fiorello");
+            mail.To.Add(new MailAddress(user.Email));
+
+            mail.Subject = "Reset Password";
+            mail.Body = $"<a href='{link}'>Please click here to reset your password</a>";
+            mail.IsBodyHtml = true;
+
+            SmtpClient smtp = new SmtpClient();
+            smtp.Host = "smtp.gmail.com";
+            smtp.Port = 587;
+            smtp.EnableSsl = true;
+
+            smtp.Credentials = new NetworkCredential("alialiyevasmoy@gmail.com", "alivasmoy123");
+            smtp.Send(mail);
+            return RedirectToAction("index", "home");
+        }
+
+        public async Task<IActionResult> ResetPassword(string email,string token)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return BadRequest();
+            AccountVM model = new AccountVM
+            {
+                AppUser = user,
+                Token = token
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(AccountVM account)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(account.AppUser.Email);
+            AccountVM model = new AccountVM
+            {
+                AppUser = user,
+                Token = account.Token
+            };
+            if (!ModelState.IsValid) return View(model);
+           IdentityResult result =  await _userManager.ResetPasswordAsync(user, account.Token, account.Password);
+            if (!result.Succeeded)
+            {
+                foreach (IdentityError error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+            return RedirectToAction("Index", "Home");
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVM login)
