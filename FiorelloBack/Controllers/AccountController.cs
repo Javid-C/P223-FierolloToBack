@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -18,7 +19,7 @@ namespace FiorelloBack.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,RoleManager<IdentityRole> roleManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -58,8 +59,46 @@ namespace FiorelloBack.Controllers
             await _userManager.AddToRoleAsync(user, "Member");
 
 
+            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            string link = Url.Action(nameof(VerifyEmail), "Account", new { email = user.Email, token }, Request.Scheme, Request.Host.ToString());
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress("alialiyevasmoy@gmail.com", "Fiorello company");
+            mail.To.Add(new MailAddress(user.Email));
+
+            mail.Subject = "Verify Email";
+            string body = string.Empty;
+            using (StreamReader reader = new StreamReader("wwwroot/assets/template/verifyemail.html"))
+            {
+                body = reader.ReadToEnd();
+            }
+            string about = $"Welcome <strong>{user.Fullname}</strong> to our company, please click the link in below to verify your account";
+
+            body = body.Replace("{{link}}", link);
+            mail.Body = body.Replace("{{About}}", about);
+            mail.IsBodyHtml = true;
+
+            SmtpClient smtp = new SmtpClient();
+            smtp.Host = "smtp.gmail.com";
+            smtp.Port = 587;
+            smtp.EnableSsl = true;
+
+            smtp.Credentials = new NetworkCredential("alialiyevasmoy@gmail.com", "alivasmoy123");
+            smtp.Send(mail);
+            TempData["Verify"] = true;
             return RedirectToAction("Index", "Home");
 
+        }
+
+        public async Task<IActionResult> VerifyEmail(string email, string token)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return BadRequest();
+            await _userManager.ConfirmEmailAsync(user, token);
+
+            await _signInManager.SignInAsync(user, true);
+            TempData["Verified"] = true;
+
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Login()
@@ -82,7 +121,7 @@ namespace FiorelloBack.Controllers
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
             string link = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme, Request.Host.ToString());
             MailMessage mail = new MailMessage();
-            mail.From = new MailAddress("alialiyevasmoy@gmail.com","Fiorello");
+            mail.From = new MailAddress("alialiyevasmoy@gmail.com", "Fiorello");
             mail.To.Add(new MailAddress(user.Email));
 
             mail.Subject = "Reset Password";
@@ -99,7 +138,7 @@ namespace FiorelloBack.Controllers
             return RedirectToAction("index", "home");
         }
 
-        public async Task<IActionResult> ResetPassword(string email,string token)
+        public async Task<IActionResult> ResetPassword(string email, string token)
         {
             AppUser user = await _userManager.FindByEmailAsync(email);
             if (user == null) return BadRequest();
@@ -122,7 +161,7 @@ namespace FiorelloBack.Controllers
                 Token = account.Token
             };
             if (!ModelState.IsValid) return View(model);
-           IdentityResult result =  await _userManager.ResetPasswordAsync(user, account.Token, account.Password);
+            IdentityResult result = await _userManager.ResetPasswordAsync(user, account.Token, account.Password);
             if (!result.Succeeded)
             {
                 foreach (IdentityError error in result.Errors)
@@ -222,7 +261,7 @@ namespace FiorelloBack.Controllers
                 user.Email = editedUser.Email;
                 user.Fullname = editedUser.Fullname;
 
-                IdentityResult result = await _userManager.ChangePasswordAsync(user,editedUser.CurrentPassword,editedUser.Password);
+                IdentityResult result = await _userManager.ChangePasswordAsync(user, editedUser.CurrentPassword, editedUser.Password);
 
                 if (!result.Succeeded)
                 {
@@ -234,9 +273,9 @@ namespace FiorelloBack.Controllers
                     return View(eUser);
                 }
             }
-            await _signInManager.PasswordSignInAsync(user, editedUser.Password,true,true);
+            await _signInManager.PasswordSignInAsync(user, editedUser.Password, true, true);
 
-            return RedirectToAction("index","home");
+            return RedirectToAction("index", "home");
 
         }
 

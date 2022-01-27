@@ -24,7 +24,7 @@ namespace FiorelloBack.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index(int page=1)
+        public IActionResult Index(int page= 1)
         {
 
             ViewBag.CurrentPage = page;

@@ -8,6 +8,16 @@
     <input type="hidden" id="toastrJs" data-succeed="@TempData["Succeeded"]" />
 }
 
+@if (TempData["Verify"] != null)
+{
+    <input type="hidden" id="verifyJS" />
+}
+
+
+@if (TempData["Verified"] != null)
+{
+    <input type="hidden" id="verifiedJS" />
+}
 <section id="introduce" class="col-lg-12 col-sm-12 col-12">
     <div class="images">
 
@@ -413,6 +423,48 @@
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     }
+                }
+            }
+            if ($("#verifyJS").length) {
+                Command: toastr["success"]("Please verify your email")
+
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": false,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "7000",
+                    "extendedTimeOut": "2000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+            }
+            if ($("#verifiedJS").length) {
+                Command: toastr["success"]("Your email has been verified")
+
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": false,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "7000",
+                    "extendedTimeOut": "2000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
                 }
             }
         })
